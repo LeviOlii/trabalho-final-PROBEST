@@ -1,5 +1,5 @@
 import { api } from '../api';
-import { AccidentProcessResult, LoginResponse } from './types';
+import { AccidentHistoryResponse, AccidentProcessResult, LoginResponse } from './types';
 
 /**
  * POST /v1/accident-processings/process
@@ -29,6 +29,24 @@ export async function postLogin(email: string, password: string): Promise<LoginR
   const response = await api.post<LoginResponse>('/v1/auth/login', {
     email,
     password,
+  });
+  return response.data;
+}
+
+/**
+ * GET /v1/accident-processings
+ * Busca histórico de análises
+ */
+export async function getAccidentHistory(params?: {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  order?: string;
+  result?: string;
+  user_id?: number;
+}): Promise<AccidentHistoryResponse> {
+  const response = await api.get<AccidentHistoryResponse>('/v1/accident-processings', {
+    params,
   });
   return response.data;
 }
