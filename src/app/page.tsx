@@ -36,6 +36,41 @@ export default function Home() {
     setResult(null);
   }
 
+  function getActionsBySeverity(severity?: string) {
+    if (severity === 'severe') {
+      return [
+        {
+          label: 'Chamar emergência 190',
+          action: () => console.log('Chamando emergência...'),
+        },
+        {
+          label: 'Acionar seguro',
+          action: () => window.open('https://www.google.com/search?q=acionar+seguro+auto'),
+        },
+        {
+          label: 'Localizar oficina próxima',
+          action: () => window.open('https://www.google.com/maps/search/oficina+auto+perto+de+mim'),
+        },
+      ];
+    }
+    if (severity === 'moderate') {
+      return [
+        {
+          label: 'Acionar seguro',
+          action: () => window.open('https://www.google.com/search?q=acionar+seguro+auto'),
+        },
+        {
+          label: 'Localizar oficina próxima',
+          action: () => window.open('https://www.google.com/maps/search/oficina+auto+perto+de+mim'),
+        },
+      ];
+    }
+    if (severity === 'not_accident') {
+      return [];
+    }
+    return [];
+  }
+
   return (
     <main className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
@@ -63,6 +98,19 @@ export default function Home() {
           {status === 'done' && result && (
             <div className="space-y-4">
               <ResultCard result={result} />
+              {result.details?.class && (
+                <div className="space-y-2">
+                  {getActionsBySeverity(result.details.class).map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={item.action}
+                      className="w-full py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-900 hover:text-white text-sm font-medium transition-colors cursor-pointer"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              )}
               <button
                 onClick={handleReset}
                 className="w-full text-sm text-gray-400 hover:text-gray-600 transition-colors"
