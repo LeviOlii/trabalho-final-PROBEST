@@ -1,5 +1,6 @@
 'use client';
 
+import { LucideX, LucideUser, LucideShieldCheck } from 'lucide-react';
 import Cookies from 'js-cookie';
 import {
   LucideArrowLeft,
@@ -17,6 +18,7 @@ import { useEffect, useState } from 'react';
 
 import { getAccidentHistory } from '@/service/api/accident';
 import { AccidentHistoryItem } from '@/service/api/types';
+import { AnimatePresence, motion } from 'framer-motion';
 
 function ResultBadge({ result }: { result: string }) {
   const styles = {
@@ -63,6 +65,7 @@ export default function HistoryPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [selectedItem, setSelectedItem] = useState<AccidentHistoryItem | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -200,7 +203,11 @@ export default function HistoryPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {data.map((item) => (
-                      <tr key={item.id} className="group hover:bg-gray-50/50 transition-colors">
+                      <tr
+                        key={item.id}
+                        onClick={() => setSelectedItem(item)}
+                        className="group hover:bg-gray-50/50 transition-colors cursor-pointer"
+                      >
                         <td className="px-6 py-4">
                           <div className="relative w-16 h-16 overflow-hidden rounded-xl border border-gray-200 shadow-sm group-hover:scale-105 transition-transform duration-300">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -282,6 +289,115 @@ export default function HistoryPage() {
             </div>
           )}
         </div>
+
+        <AnimatePresence>
+          {selectedItem && (
+            <motion.div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedItem(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-3xl shadow-2xl max-w-5xl w-full overflow-hidden"
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between px-8 py-5 border-b">
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">Detalhes da Análise</h2>
+                    <p className="text-xs text-gray-500">Registro #{selectedItem.id}</p>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedItem(null)}
+                    className="p-2 rounded-full hover:bg-gray-100 transition"
+                  >
+                    <LucideX className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+
+                {/* Conteúdo */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+                  {/* Imagem */}
+                  <div className="flex items-center justify-center bg-gray-50">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={selectedItem.image}
+                      alt="Imagem da análise"
+                      className=" w-full
+                      max-h-[75vh]
+                      object-contain
+                      rounded-xl
+                      shadow-2xl
+                      transition-transform
+                      duration-300
+                      hover:scale-[1.01]"
+                    />
+                  </div>
+
+                  {/* Informações */}
+                  <div className="flex flex-col justify-between">
+                    <div className="space-y-6">
+                      <div>
+                        <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">
+                          Resultado da IA
+                        </p>
+                        <ResultBadge result={selectedItem.result} />
+                      </div>
+
+                      <div>
+                        <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">
+                          Confiança
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl font-bold text-gray-900">
+                            {(selectedItem.confidence * 100).toFixed(1)}%
+                          </span>
+                          <LucideShieldCheck className="w-6 h-6 text-indigo-600" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">
+                          Data da análise
+                        </p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {new Date(selectedItem.created_at).toLocaleString('pt-BR')}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">
+                          Usuário
+                        </p>
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <LucideUser className="w-4 h-4 text-gray-400" />
+                          {selectedItem.user.email}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="pt-6 mt-8 border-t flex justify-end">
+                      <button
+                        onClick={() => setSelectedItem(null)}
+                        className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition"
+                      >
+                        Fechar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
