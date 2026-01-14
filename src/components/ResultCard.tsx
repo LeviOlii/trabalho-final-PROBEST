@@ -57,7 +57,7 @@ export function ResultCard({ result }: ResultCardProps) {
       };
     return {
       title: 'Não foi possível identificar com clareza',
-      subtitle: 'Tente enviar outra imagem/vídeo mais nítido.',
+      subtitle: 'Tente enviar outra imagem mais nítida.',
       theme: 'border-gray-200 bg-gray-50',
       badge: 'bg-gray-100 text-gray-700 ring-gray-200',
     };
